@@ -21,7 +21,8 @@
 * **password** (string): password of the user
 
 #### Date (not an object!)
-Represented as ISO 8601 string looking like: "2015-06-14T19:04:43.238851". May need to add timezone support later.
+Represented as an integer number of seconds since the Unix epoch (January 1, 1970). For example: June 17, 2015 at 17:55:55, would be represented as 1434563755. See [Unix Time](https://en.wikipedia.org/wiki/Unix_time).
+*May need to add timezone support later.*
 
 ## Endpoints
 #### `GET /notes`
