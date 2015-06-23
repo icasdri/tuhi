@@ -55,7 +55,7 @@ For example:
             "title": "My Second Note",
             "deleted": false,
             "date_modified": "2015-06-14T17:57:08.826480"
-        },
+        }
     ],
     "note_contents": [
         {
