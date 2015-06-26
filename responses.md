@@ -3,6 +3,7 @@
 ## Endpoint `POST /notes`
 #### HTTP Responses
 **HTTP 200 OK**: SUCCESS!
+
 **HTTP 400 Bad Request**: 
 * *Response with No Body*: Malformed JSON
 * *Response with Body with JSON*: signifies a **Top-level Error**
