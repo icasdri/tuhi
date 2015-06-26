@@ -29,16 +29,16 @@ Represented as an integer number of seconds since the Unix epoch (January 1, 197
 * **Query Parameters**: (all optional, will return all if none given)
 	* *after* (date): all `Notes` modified after date and all `Note Contents` created after date on the server.
 	* *head* (boolean): if true, returns only the most recent `Note Content` for every `Note`
-* **Response Body**: one dict with two lists containing the data on the server but not synced the client yet (see *Body* below)
+* **Response Body**: one dict with two lists containing the data on the server but not synced to the client yet (see *Body* below)
 
 
 #### `POST /notes`
 * **Request Body**: one dict with two lists containing the data on the client but not synced to the server yet (see *Body* below)
-* **Response Body**: TO BE DETERMINED (failure enumeration, etc.)
+* **Response Body**: see [Responses](https://github.com/icasdri/tuhi/blob/master/responses.md).
 
 
 ## Body
-The `GET` and `POST` endpoints of `/notes` takes a body consisting of a dict with two lists. Each list is a list of one of `Note` or `Note Content`. 
+The `GET` and `POST` endpoints of `/notes` takes a body consisting of a dict with two lists. Each list is a list of one of `Note` or `Note Content`.
 
 For example:
 
