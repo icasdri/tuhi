@@ -25,6 +25,8 @@ Represented as an integer number of seconds since the Unix epoch (January 1, 197
 *May need to add timezone support later.*
 
 ## Endpoints
+Both endpoints require authentication. See [Authentication](https://github.com/icasdri/tuhi/blob/master/authentication.md).
+
 #### `GET /notes`
 * **Query Parameters**: (all optional, will return all if none given)
 	* *after* (date): all `Notes` modified after date and all `Note Contents` created after date on the server.

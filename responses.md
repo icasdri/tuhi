@@ -70,11 +70,4 @@ Note that within each `note` and `note_content` object, the server returns back 
 
 Note that `note` object that are completely valid with no errors will simply not be enumerated.
 
-## Error Codes
-* **0**: *Valid but not processed*: given field is valid at this level, but was not processed due to other errors at this level
-* **11**: *Missing*: given field is missing
-* **12**: *Incorrect type*: given field is of incorrect type (in case of top-levels, is not list)
-* **21**: *Too long*: given field (probably a string field) has exceeded a maximum allowable length
-* **23**: *Invalid Date*: given date field is not sane
-* **31**: *Invalid UUID*: given id field is of string type but is not of length 36 and formatted as a uuid (with `-` in the correct places)
-* **32**: *UUID Conflict*: how does this happen?! -- note that this will only be detectable on `note_content` (which are immutable); if so, client must regenerate a UUID for that `note_content`
+An attempt to update a restricted resource (as in a Note or Note Content not owned by the authenticated user) will result in an additional field `authentication` with `ERROR_CODE` *90* -- within the `note` or `note_content` object in question. See the *Forbidden* section of [Authentication](https://github.com/icasdri/tuhi/blob/master/authentication.md) for details.
