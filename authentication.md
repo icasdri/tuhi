@@ -32,7 +32,7 @@ where `USERNAME` and `PASSWORD` are strings representing the username and passwo
      	```
      when authentication failed due to incomplete information, non-existent users, or incorrect passwords.
 
-    In both cases, ERROR_CODE is one of the error codes documented [here](https://github.com/icasdri/tuhi/blob/master/error_codes.md).
+    In both cases, ERROR_CODE is one of the error codes documented  at [Error Codes](https://github.com/icasdri/tuhi/blob/master/error_codes.md).
 
 * **HTTP 403 Forbidden**: occurs when authentication was successful, however, the authenticated user is not authorized to access a given resource.
 	* Note: a *Forbidden* response can be part of a **Sub-unit Error** response documented in [Responses](https://github.com/icasdri/tuhi/blob/master/responses.md). In that case, an additional field `authentication` will be added to the object in question (either a Note or Note Content) and will have ERROR_CODE = 90.

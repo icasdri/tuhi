@@ -20,7 +20,7 @@ Response will have general structure:
     "note_contents_errors": ERROR_CODE
 }
 ```
-where `ERROR_CODE` is one of the error codes listed at the bottom of this document that is relevant, and where a suffix `_errors` denotes that that is invalid.
+where `ERROR_CODE` is one of the error codes listed at [Error Codes](https://github.com/icasdri/tuhi/blob/master/error_codes.md) that is relevant, and where a suffix `_errors` denotes that that is invalid.
 
 Even if one of the top-levels is present in correct form, the server will *not* process them; thus no sub-unit errors will be recieved *even if they exist*. In this case, the top-level that is present will simply not be enumerated.
 
@@ -64,7 +64,7 @@ Response will have general structure:
     ]
 }
 ```
-where `ERROR_CODE` is one of the relevant error codes listed at the bottom of this document, and where a suffix `_errors` denotes that that field is invalid.
+where `ERROR_CODE` is one of the relevant error codes listed in [Error Codes](https://github.com/icasdri/tuhi/blob/master/error_codes.md) and where a suffix `_errors` denotes that that field is invalid.
 
 Note that within each `note` and `note_content` object, the server returns back the `note_id` and `note_content_id` *given to it*, so as to identify the note.
 
