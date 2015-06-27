@@ -16,21 +16,25 @@ where `USERNAME` and `PASSWORD` are strings representing the username and passwo
 
 ### Responses
 * **HTTP 401 Unauthorized**: signifies an unsuccessful authentication or lack of `Authorization` header. Data in response will be of one of the following forms:
-	*	```json
+
+    ```json
+    {
+        "authentication_errors": ERROR_CODE
+    }
+    ```
+    
+	when there's a lack of authentication information altogether or JSON errors in `Authorization` payload.
+    
+    ```json
         {
-            "authentication_errors": ERROR_CODE
-        }
-        ```
-    when there's a lack of authentication information altogether or JSON errors in `Authorization` payload.
-    *	```json
-    		{
-                "authentication": {
-                    "username_errors": ERROR_CODE,
-                    "password_errors": ERROR_CODE
-                }
+            "authentication": {
+                "username_errors": ERROR_CODE,
+                "password_errors": ERROR_CODE
             }
-     	```
-     when authentication failed due to incomplete information, non-existent users, or incorrect passwords.
+        }
+    ```
+    
+	when authentication failed due to incomplete information, non-existent users, or incorrect passwords.
 
     In both cases, ERROR_CODE is one of the error codes documented  at [Error Codes](https://github.com/icasdri/tuhi/blob/master/error_codes.md).
 
