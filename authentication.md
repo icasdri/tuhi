@@ -28,20 +28,20 @@ The header should look something like:
 * **HTTP 401 Unauthorized**: signifies an unsuccessful authentication or lack of `Authorization` header. Data in response will be of one of the following forms:
 
     ```json
-{
-    "authentication_errors": ERROR_CODE
-}
+    {
+        "authentication_errors": ERROR_CODE
+    }
     ```
     
 	when there's a lack of authentication information altogether or JSON errors in `Authorization` payload.
     
     ```json
-{
-    "authentication": {
-        "username_errors": ERROR_CODE,
-        "password_errors": ERROR_CODE
+    {
+        "authentication": {
+            "username_errors": ERROR_CODE,
+            "password_errors": ERROR_CODE
+        }
     }
-}
     ```
     
 	when authentication failed due to incomplete information, non-existent users, or incorrect passwords.
