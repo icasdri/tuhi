@@ -3,9 +3,10 @@
 ## Models
 #### Note
 * **note_id** (string): uuid of Note
-* **title** (string): title of Note
 * **deleted** (boolean): whether Note is marked as deleted or not
 * **date_modified** (date): the date this Note object is modified (aka. the date note metadata changed)
+
+For purpose of synchronization, the server is unaware of the current "title" of the Note. Clients should automatically derive the "title" of the Note from the first line of the most recent NoteContent as specified in Client Spec (to be created).
 
 
 #### Note Content
@@ -43,13 +44,11 @@ For example:
     "notes": [
         {
             "note_id": "8c9d9813-6ff7-45b9-9268-55799978b119",
-            "title": "My First Note",
             "deleted": false,
             "date_modified": 1435973780
         },
         {
             "note_id": "b0971251-f35d-405d-9045-f2e5f98de6b7",
-            "title": "My Second Note",
             "deleted": false,
             "date_modified": 1435973782
         }
