@@ -12,8 +12,14 @@ For purpose of synchronization, the server is unaware of the current "title" of 
 #### Note Content
 * **note_content_id** (string): uuid of Note Content
 * **note** (ref:string): reference (as note_id) to a Note
+* **type** (int): type id representing the type of this Note Content (see below)
 * **data** (*huge* string): the actual content, the data
 * **date_created** (date): the date this Note Content object was created (aka. the date note content changed)
+
+###### Note Content Types
+* **-2**: permanent deletion (this Note Content represents the permanent deletion of its entire note -- all Note Contents other than this one should be immediately purged)
+* **-1**: trashed (note was soft-deleted, aka. moved to trash)
+* **0**: plain (plain text)
 
 #### Date (not an object!)
 Represented as an integer number of seconds since the Unix epoch (January 1, 1970). For example: June 17, 2015 at 17:55:55, would be represented as 1434563755. See [Unix Time](https://en.wikipedia.org/wiki/Unix_time).
