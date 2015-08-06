@@ -63,18 +63,21 @@ For example:
         {
             "note_content_id": "be7a8333-cba6-456c-9519-0e9da0cf1da9",
             "note": "8c9d9813-6ff7-45b9-9268-55799978b119",
+            "type": 0,
             "data": "This is the actual data for my first note. At least some version of it.\nThis string may become very very long.",
             "date_created": 1435973785
         },
         {
             "note_content_id": "cca23aab-4a2c-4604-a3e7-30de25300731",
             "note": "8c9d9813-6ff7-45b9-9268-55799978b119",
+            "type": 0,
             "data": "This is the actual data for my first note, edited a liitle. This is another version of it.\nThis string may become very very long.",
             "date_created": 1435973786
         },
         {
             "note_content_id": "f079c073-6a96-45d1-81fa-dbbedef4bff8",
             "note": "b0971251-f35d-405d-9045-f2e5f98de6b7",
+            "type": 0,
             "data": "Here's my second note.\nIt could be much much longer.",
             "date_created": 1435973792
         }
