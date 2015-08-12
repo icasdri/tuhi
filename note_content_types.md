@@ -9,19 +9,19 @@ Most types take the form *SAAABBCCC*, where
 * *BB* is the two-digit display flag (details below).
 * *CCC* is the three-digit encryption code (details below).
 
-The **only** exception to this form, is the Note Content type '-2' which signifies that the corresponding Note has been **permanenty deleted**
+The **only** exception to this form, is the Note Content type '-2' which signifies that the corresponding Note has been **permanenty deleted**.
 
 #### Sign
 Signs are used to signify whether a Note Content is soft-deleted, aka. trashed. (and therefore also if the Note Content is the head/most-recent Note Content, whether it's corresponding note is soft-deleted, aka. trashed)
-* Positive sign (signified by an absence of sign on the integer) signifies a *normal* or *non-deleted* Note Content.
-* Negative sign (signified by '-') signifies a *soft-delted* Note Content.
+* Positive sign (signified by an absence of sign on the integer) signifies a **regular** or **non-deleted** Note Content.
+* Negative sign (signified by '-') signifies a **soft-deleted** Note Content.
 
-### Content Codes
+#### Content Codes
 Content codes are used to signify the actual content "type" of the note. Currently only one type is implemented, which is enumerated below.
 * *100*: plain text
 
 #### Display Flags
-Display flags are used to signify certain display-specific components. Currently they are used to specify whether **word-wrap** and **spell-check** should be used when displaying the Note.
+Display flags are used to signify certain display-specific components. Currently they are used to specify whether **word-wrap** and/or **spell-check** should be used when displaying the Note.
 * *00*: no word-wrap. no spell-check.
 * *01*: word-wrap. no spell-check.
 * *02*: no word-wrap. spell-check.
