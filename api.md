@@ -3,8 +3,7 @@
 ## Models
 #### Note
 * **note_id** (string): uuid of Note
-* **deleted** (boolean): whether Note is marked as deleted or not
-* **date_modified** (date): the date this Note object is modified (aka. the date note metadata changed)
+* **date_created** (date): the date this Note object was created
 
 For purpose of synchronization, the server is unaware of the current "title" of the Note. Clients should automatically derive the "title" of the Note from the first line of the most recent NoteContent as specified in Client Spec (to be created).
 
@@ -45,34 +44,32 @@ For example:
     "notes": [
         {
             "note_id": "8c9d9813-6ff7-45b9-9268-55799978b119",
-            "deleted": false,
-            "date_modified": 1435973780
+            "date_created": 1435973780
         },
         {
             "note_id": "b0971251-f35d-405d-9045-f2e5f98de6b7",
-            "deleted": false,
-            "date_modified": 1435973782
+            "date_created": 1435973782
         }
     ],
     "note_contents": [
         {
             "note_content_id": "be7a8333-cba6-456c-9519-0e9da0cf1da9",
             "note": "8c9d9813-6ff7-45b9-9268-55799978b119",
-            "type": 0,
+            "type": 10000000,
             "data": "This is the actual data for my first note. At least some version of it.\nThis string may become very very long.",
             "date_created": 1435973785
         },
         {
             "note_content_id": "cca23aab-4a2c-4604-a3e7-30de25300731",
             "note": "8c9d9813-6ff7-45b9-9268-55799978b119",
-            "type": 0,
+            "type": 10000000,
             "data": "This is the actual data for my first note, edited a liitle. This is another version of it.\nThis string may become very very long.",
             "date_created": 1435973786
         },
         {
             "note_content_id": "f079c073-6a96-45d1-81fa-dbbedef4bff8",
             "note": "b0971251-f35d-405d-9045-f2e5f98de6b7",
-            "type": 0,
+            "type": 10000000,
             "data": "Here's my second note.\nIt could be much much longer.",
             "date_created": 1435973792
         }
