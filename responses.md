@@ -34,16 +34,12 @@ Response will have general structure:
     	{
         	"note_id": NOTE_ID,
             "note_id_errors": ERROR_CODE,
-            "title_errors": ERROR_CODE,
-            "deleted_errors": ERROR_CODE,
-            "date_modified_errors": ERROR_CODE
+            "date_created_errors": ERROR_CODE
         },
         {
         	"note_id": NOTE_ID,
             "note_id_errors": ERROR_CODE,
-            "title_errors": ERROR_CODE,
-            "deleted_errors": ERROR_CODE,
-            "date_modified_errors": ERROR_CODE
+            "date_created_errors": ERROR_CODE
         }
     ],
     "note_contents": [
@@ -51,6 +47,7 @@ Response will have general structure:
         	"note_content_id": NOTE_CONTENT_ID,
             "note_content_id_errors": ERROR_CODE,
             "note_errors": ERROR_CODE,
+            "type_errors": ERROR_CODE,
             "data_errors": ERROR_CODE,
             "date_created_errors": ERROR_CODE
         },
@@ -58,6 +55,7 @@ Response will have general structure:
         	"note_content_id": NOTE_CONTENT_ID,
             "note_content_id_errors": ERROR_CODE,
             "note_errors": ERROR_CODE,
+            "type_errors": ERROR_CODE,
             "data_errors": ERROR_CODE,
             "date_created_errors": ERROR_CODE
         }
