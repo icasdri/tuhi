@@ -6,6 +6,7 @@
   * [Entities](#entities)
     * [`Note`](#note)
     * [`Note Content`](#note-content)
+  * [Local Workflow](#local-workflow)
   * [Packaging](#packaging)
     * [Packaging Methods](#packaging-methods)
       * [`none`](#none)
@@ -18,11 +19,9 @@
 
 Tuhi stores notes (and, in the future, note-like things such as todo lists) using two data models, `Note` and `Note Content`. A `Note` is an entity identifying a specific note with relevant metadata such as a date of creation. Additionally, a `Note` is a collection of `Note Content`s. Each `Note Content` represents what a `Note` looked like (aka. the content) at a specific time in history. The collection of `Note Content`s for each `Note` thus represents that `Note`'s history.
 
-`Note`s and `Note Content`s are **immutable**. That is, once they're created, their contents (i.e. their field values) never change. Ever. To modify a note, make a new `Note Content` associated with that `Note` with a newer `date_created`. Furthermore, *permanent deletion* (to be discussed later) aside, `Note`s and `Note Content`s should preferably not be deleted. Immutability of entities guarantees that once those entities are synced, their synced for good and neither client nor server needs to worry about them again.
-
 ### Entities
 
-Clients may choose to store `Note`s and `Note Content`s in any way of their choosing (a database, collection of files, or otherwise), as long as they maintain the required elements of each entity as listed below, as well as the relationship of which `Note Content` belongs to which `Note` (e.g. in a foreign-key relationship in a database).
+Listed below are the details of the two entities, `Note` and `Note Content`, used by Tuhi. Clients may choose to store these in any way of their choosing (be it a database, collection of files, or otherwise), as long as they maintain the required elements of each entity as listed below, as well as the relationship of which `Note Content` belongs to which `Note` (e.g. in a foreign-key relationship in a database).
 
 #### `Note`
 
@@ -36,7 +35,24 @@ Clients may choose to store `Note`s and `Note Content`s in any way of their choo
 * **nc_local_id** (integer): client-unique identifier for this `Note Content` on this client
 * **nc_sync_id** (integer): server-unique identifier for this `Note Content` on the server (this is obtained from server -- *see [Syncing](#syncing) for details*)
 * **date_created** (integer): the date this `Note` was created on the client (expressed as seconds since the Unix epoch)
+* **deleted** (integer): 0 for non-deleted, 1 for soft-deleted (i.e. trashed), 2 for permanently deleted (*see [Deletion](#deletion) for details*)
 * **packaged_data** (string): the raw (packaged) data (*see [Packaging](#packaging) and [Unpackaged Data](#unpackaged-data) for details*)
+
+### Local Workflow
+
+The general way that *clients* should interact with the `Note` and `Note Content` entities is as follows:
+
+To update/modify a note, make a new `Note Content` associated with the `Note` being updated and set the updated/modified content appropriately in `packaged_data` (*see [Packaging](#packaging) and [Unpackaged Data](#unpackaged-data) for details*). Obviously set the `nc_local_id`, `date_created`, and `deleted` fields appropriately as well.
+
+To go back to a previous version of a note, the process is the same -- think of it as updating/modifying the note with the contents of a previous version. Thus, here, the `packaged_data` of the new `Note Content` would just be copied from the `Note Content` representing the desired version.
+
+To (soft) delete a note (i.e. put it in the Trash), make a new `Note Content` with `packaged_data` copied from the non-deleted version, but with `deleted` set to 1. 
+
+To restore a note from the Trash, in a similar fashion, make a new `Note Content` with `packaged_data` copied from the deleted version (remember, it was copied from the non-deleted version), but with `deleted` set to 0.
+
+To permanently delete a note, make a new `Note Content`, with `deleted` set to 2 (the *permanent deletion request*). Addidionally, delete (as in drop from the database, `rm` from the filesystem, etc.) all other `Note Content`s (this is the *permanent* part). Then, after syncing the *permanent deletion request* with the server (*see [Syncing](#syncing) for details*), that may be deleted as well -- the server will take care of propogating to other clients from there. If a client has a *permanent deletion request* synced in, it may be desirable (and is mandated for encrypted notes) to confirm with the user that he/she has indeed permanently deleted it in order to prevent a sort of Denial of Service attack resulting in data loss.
+
+See that `Note`s and `Note Content`s are **immutable**. That is, once they're created, their contents (i.e. their field values) never change. Ever. Immutability guarantees that once entities are synced, they're synced for good and neither client nor server needs to worry about them again.
 
 ### Packaging
 
@@ -54,9 +70,9 @@ In the future, we will define more packaging methods (performing actions such as
 
 ### Unpackaged Data
 
-The *unpackaged data* of a `Note Content` (that is the `packaged_data` after being run through the *packaging method*) is **stringified JSON** that houses the actual data (user-visible content) of the note (or more precisely the `Note Content` -- i.e. the note at a specific point in time). This data includes the *type* of the note (i.e. is it a plain ol' note, a todo list, a kanban board, etc.) and, of course, type-specific content of what exactly the user sees. 
+The *unpackaged data* of a `Note Content` refers to thhe `packaged_data` after being run through the appropriate *packaging method*. It is **stringified JSON** that houses the actual data (user-visible content) of the note (or more precisely the `Note Content` -- the note at a specific point in time). This data includes the *type* of the note (i.e. is it a plain ol' note, a todo list, a kanban board, etc.) and, of course, the actual type-specific content that represent what the user sees. 
 
-For clients to interact with *unpackaged data*, they must first run `packaged_data` through the corresponding *packaging method*, then parse the resulting string to obtain the JSON structure. 
+To interact with *unpackaged data*, clients must first run `packaged_data` through the corresponding *packaging method*, then parse the resulting string to obtain the JSON structure. 
 
 The only fields of the resulting JSON object that is guaranteed is `type` (denoting the type of the note) and `title` (the title of the note) -- everything else is type-specific data (see [Types](#types) below).
 
