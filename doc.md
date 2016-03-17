@@ -9,17 +9,17 @@
   * [Local Workflow](#local-workflow)
   * [Packaging](#packaging)
     * [Packaging Methods](#packaging-methods)
-      * [`none`](#none)
+      * [`none`](#pm-none)
   * [Unpackaged Data](#unpackaged-data)
     * [Types](#types)
-      * [`plain`](#plain)
+      * [`plain`](#ty-plain)
 * [Syncing](#syncing)
     * [Authentication](#authentication)
     * [Endpoint `notes`](#endpoint-notes)
-        * [GET `notes`](#get-notes)
-            * [Success](#success)
-            * [Failure](#failure)
-            * [Sample response](#sample-response)
+        * [GET `notes`](#ep-notes-get)
+            * [Success](#ep-notes-get-success)
+            * [Failure](#ep-notes-get-failure)
+            * [Sample response](#ep-notes-get-sample-response)
 
 ## Format
 
@@ -68,7 +68,7 @@ Observe that `packaging_method` is specified in `Note` and recall that `Note`s a
 
 #### Packaging Methods
 
-##### `none`
+##### <a name="pm-none"></a>`none`
 
 This methods essentially does nothing. It takes the `pacakaged_data` field of `Note Content` directly/literally as the [Unpackaged Data](#unpackaged-data) -- no transformations are made.
 
@@ -93,7 +93,7 @@ The only fields of the resulting JSON object that is guaranteed is `type` (denot
 
 #### Types
 
-##### `plain`
+##### <a name="ty-plain"></a>`plain`
 
 This type denotes a plain ol' note. It's JSON structure is as follows:
 
@@ -137,11 +137,11 @@ It looks something like this:
 
 This is the primary endpoint of all Tuhi synchronization operations. Send a HTTP `GET` to retrieve notes from the server (that is `Note`s and `Note Content`s), or an HTTP `POST` to sync notes to the server. Details below.
 
-#### GET `notes`
+#### <a name="ep-notes-get"></a>GET `notes`
 
 When retrieving notes, clients should specify an optional `after` URL parameter. `after` specifies the date (in seconds since Unix epoch) in which the client last retrieved notes from the server (this is the responsibility of the client to store somewhere). This allows the server to return only the newer entities, instead of what essentially amounts to the entire database. For  instance, use GET `/tuhi/v0_4/notes?after=1435973780`.
 
-##### Success
+##### <a name="ep-notes-get-success"></a>Success
 
 On **success** (successful authentication and no server-side errors), the server will respond with **HTTP 200 OK** with a body containing a JSON object (see sample response below). This JSON object will contain one `notes` field, which houses a JSON Array of `Note` entities in JSON form. Each of these `Note` entities then contain their respective `n_sync_id` (the server-side identifier), `date_created`, and `packaging_method` fields (*see [Entities](#entities) for details*).
 
@@ -149,13 +149,13 @@ Within each `Note` entity is also a `note_contents` field which houses a JSON Ar
 
 Note that there are no local id's in the response, as these entities are presumed to have been created on another client. Thus, clients must match up the sync id's the their corresponding local id's (to that client), or more likely create new records (with new local id's) for the incoming entities.
 
-##### Failure
+##### <a name="ep-notes-get-failure"></a>Failure
 
 On an **authentication failure**, (e.g. non-existent username, incorrect password, or no HTTP Basic Authentication sent), the server will respond with **HTTP 401 Unauthorized** with an optional body containing a plain text message. Clients should prompt the user to correct the password, etc.
 
 On a **server-side error**, the server will respond with the standard **HTTP 500 Internal Server Error** with an optional body containing a plain text message describing the error. Clients should alert the user to the issue. 
 
-##### Sample response
+##### <a name="ep-notes-get-sample-response"></a>Sample response
 
 ```json
 {
