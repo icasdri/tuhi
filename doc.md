@@ -22,6 +22,8 @@
         * [POST `notes`](#ep-notes-post)
             * [Request Format](#ep-notes-post-request)
             * [Response Format](#ep-notes-post-response)
+            * [Sample Request](#ep-notes-post-sample-request)
+            * [Sample Response](#ep-notes-post-sample-response)
 
 ## Format
 
@@ -157,6 +159,7 @@ On a **server-side error**, the server will respond with the standard **HTTP 500
 
 ##### <a name="ep-notes-get-sample-response"></a>Sample Response
 
+HTTP 200 OK
 ```json
 {
     "notes": [
@@ -245,4 +248,104 @@ The following will be included with each entity in the response:
     * *unknown*: an unknown server-side error occurred while processing the `Note` or its enclosed `Note Content`s
 * **reason** (optional; may not be present, even for failures): a semi-human-readable message describing the specifics of an error that occurred. 
 
+##### <a name="ep-notes-post-sample-request"></a>Sample Request
 
+```json
+{
+    "notes": [
+        {
+            "n_local_id": 5,
+            "n_sync_id": 0, # this is new to the server
+            "date_created": 1435973782,
+            "packaging_method": "none",
+            "note_contents": [
+                {
+                    "nc_local_id": 120,
+                    # omitting sync id's is the same as specifying 0
+                    "date_created": 1435974569,
+                    "deleted": 0,
+                    "packaged_data": "{ ... some beginner content ... }"
+                }
+            ]
+        },
+        {
+            "n_local_id": 3,
+            "n_sync_id": 9, # this is already on the server (all other fields omitted)
+            "note_contents": [
+                {
+                    "nc_local_id": 84,
+                    "date_created": 1435970023,
+                    "deleted": 0,
+                    "packaged_data": "{ ... old update ... }"
+                },
+                {
+                    "nc_local_id": 118,
+                    "date_created": 1435970433,
+                    "deleted": 0,
+                    "packaged_data": "{ ... neweset update from this client ... }"
+                }
+            ]
+        },
+        {
+            "n_local_id": 2,
+            "n_sync_id": 14,
+            "note_contents": [
+                {
+                    "nc_local_id": 51,
+                    "date_created": 1435970023,
+                    "deleted": 0,
+                    "packaged_data": "{ ... }"
+                }
+            ]
+        }
+    ]
+}
+`
+
+##### <a name="ep-notes-post-sample-response"></a>Sample Response
+
+HTTP 202 Accepted
+```json
+{
+    "notes": [
+        {
+            "n_local_id": 5,
+            "n_sync_id": 16, # new sync id given back by server
+            "status": "success",
+            "note_contents": [
+                {
+                    "nc_local_id": 120,
+                    "nc_sync_id": 541, # new sync id given back by server
+                }
+            ]
+        },
+        {
+            "n_local_id": 3,
+            "n_sync_id": 9, # the same sync id that was sent
+            "status": "success",
+            "note_contents": [
+                {
+                    "nc_local_id": 84,
+                    "nc_sync_id": 545, # new sync id given back by server
+                },
+                {
+                    "nc_local_id": 118,
+                    "nc_sync_id": 546, # new sync id given back by server
+                }
+            ]
+        },
+        {
+            "n_local_id": 2,
+            "n_sync_id": 14, # the same sync id that was sent
+            "status": "forbidden",
+            "reason": "Note with sync id 14 does not belong to current user!",
+            "note_contents": [
+                {
+                    "nc_local_id": 51,
+                    "nc_sync_id": 0 # a new sync id was not assigned, because forbidden
+                }
+            ]
+        }
+    ]
+}
+```
