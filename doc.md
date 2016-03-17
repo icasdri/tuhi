@@ -14,6 +14,12 @@
     * [Types](#types)
       * [`plain`](#plain)
 * [Syncing](#syncing)
+    * [Authentication](#authentication)
+    * [Endpoint `notes`](#endpoint-notes)
+        * [GET `notes`](#get-notes)
+            * [Success](#success)
+            * [Failure](#failure)
+            * [Sample response](#sample-response)
 
 ## Format
 
@@ -115,4 +121,89 @@ The type-specific fields for "plain" are as follows
 
 ## Syncing
 
-*WIP*
+Tuhi uses an HTTP-based synchronization protocol. Note that as Tuhi is asynchronous, it may **not** be assumed that the server will be available at all times. Clients must assume that in the majority of situations, the server is unavailable. See [Format](#format) above for how entities are maintained locally before syncing.
+
+Servers expose all endpoints (currently only one) under the path `/tuhi/v0_4` where `v0_4` indicates the protocol version 0.4 (the version expounded in this document). Thus, the `notes` endpoint would be located at `/tuhi/v0_4/notes`.
+
+### Authentication
+
+All endpoints require authentication unless otherwise noted. Tuhi uses username+password authentication via [HTTP Basic Authentication](https://en.wikipedia.org/wiki/Basic_access_authentication), as per [RFC 2617](https://tools.ietf.org/html/rfc2617). This involves encoding the `username:password` as a Base64 string in the `Authorization` header of the HTTP request. Most HTTP libraries provide APIs that do this automatically. 
+
+It looks something like this:
+
+    Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
+### Endpoint `notes`
+
+This is the primary endpoint of all Tuhi synchronization operations. Send a HTTP `GET` to retrieve notes from the server (that is `Note`s and `Note Content`s), or an HTTP `POST` to sync notes to the server. Details below.
+
+#### GET `notes`
+
+When retrieving notes, clients should specify an optional `after` URL parameter. `after` specifies the date (in seconds since Unix epoch) in which the client last retrieved notes from the server (this is the responsibility of the client to store somewhere). This allows the server to return only the newer entities, instead of what essentially amounts to the entire database. For  instance, use GET `/tuhi/v0_4/notes?after=1435973780`.
+
+##### Success
+
+On **success** (successful authentication and no server-side errors), the server will respond with **HTTP 200 OK** with a body containing a JSON object (see sample response below). This JSON object will contain one `notes` field, which houses a JSON Array of `Note` entities in JSON form. Each of these `Note` entities then contain their respective `n_sync_id` (the server-side identifier), `date_created`, and `packaging_method` fields (*see [Entities](#entities) for details*).
+
+Within each `Note` entity is also a `note_contents` field which houses a JSON Array of the associated `Note Content` entities of this `Note` in JSON form. Each of these `Note Content` entities will then contain their respective `nc_sync_id` (the server-side identifier), `date_created`, and `deleted`, and `packaged_data` fields (*see [Entities](#entities) for details*).
+
+Note that there are no local id's in the response, as these entities are presumed to have been created on another client. Thus, clients must match up the sync id's the their corresponding local id's (to that client), or more likely create new records (with new local id's) for the incoming entities.
+
+##### Failure
+
+On an **authentication failure**, (e.g. non-existent username, incorrect password, or no HTTP Basic Authentication sent), the server will respond with **HTTP 401 Unauthorized** with an optional body containing a plain text message. Clients should prompt the user to correct the password, etc.
+
+On a **server-side error**, the server will respond with the standard **HTTP 500 Internal Server Error** with an optional body containing a plain text message describing the error. Clients should alert the user to the issue. 
+
+##### Sample response
+
+```json
+{
+    "notes": [
+        {
+            "n_sync_id": 23,
+            "date_created": 1435973782,
+            "packaging_method": "none",
+            "note_contents": [
+                {
+                    "nc_sync_id": 321,
+                    "date_created": 1435974569,
+                    "deleted": 0,
+                    "packaged_data": "{ ... old packaged data stuff ... }"
+                },
+                {
+                    "nc_sync_id": 324,
+                    "date_created": 1435974778,
+                    "deleted": 0,
+                    "packaged_data": "{ ... packaged data stuff ... }"
+                }
+            ]
+        },
+        {
+            "n_sync_id": 12,
+            "date_created": 1435970001,
+            "packaging_method": "none",
+            "note_contents": [
+                {
+                    "nc_sync_id": 256,
+                    "date_created": 1435970023,
+                    "deleted": 0,
+                    "packaged_data": "{ ... old stuff for this note ... }"
+                },
+                {
+                    "nc_sync_id": 287,
+                    "date_created": 1435970187,
+                    "deleted": 0,
+                    "packaged_data": "{ ... less old stuff ... }"
+                },
+                {
+                    "nc_sync_id": 291,
+                    "date_created": 1435970433,
+                    "deleted": 0,
+                    "packaged_data": "{ ... stuff for this note ... }"
+                }
+            ]
+        }
+    ]
+}
+```
