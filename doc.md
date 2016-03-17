@@ -17,9 +17,11 @@
     * [Authentication](#authentication)
     * [Endpoint `notes`](#endpoint-notes)
         * [GET `notes`](#ep-notes-get)
-            * [Success](#ep-notes-get-success)
-            * [Failure](#ep-notes-get-failure)
-            * [Sample response](#ep-notes-get-sample-response)
+            * [Response Format](#ep-notes-get-response)
+            * [Sample Response](#ep-notes-get-sample-response)
+        * [POST `notes`](#ep-notes-post)
+            * [Request Format](#ep-notes-post-request)
+            * [Response Format](#ep-notes-post-response)
 
 ## Format
 
@@ -141,7 +143,7 @@ This is the primary endpoint of all Tuhi synchronization operations. Send a HTTP
 
 When retrieving notes, clients should specify an optional `after` URL parameter. `after` specifies the date (in seconds since Unix epoch) in which the client last retrieved notes from the server (this is the responsibility of the client to store somewhere). This allows the server to return only the newer entities, instead of what essentially amounts to the entire database. For  instance, use GET `/tuhi/v0_4/notes?after=1435973780`.
 
-##### <a name="ep-notes-get-success"></a>Success
+##### <a name="ep-notes-get-response"></a>Response Format
 
 On **success** (successful authentication and no server-side errors), the server will respond with **HTTP 200 OK** with a body containing a JSON object (see sample response below). This JSON object will contain one `notes` field, which houses a JSON Array of `Note` entities in JSON form. Each of these `Note` entities then contain their respective `n_sync_id` (the server-side identifier), `date_created`, and `packaging_method` fields (*see [Entities](#entities) for details*).
 
@@ -149,13 +151,11 @@ Within each `Note` entity is also a `note_contents` field which houses a JSON Ar
 
 Note that there are no local id's in the response, as these entities are presumed to have been created on another client. Thus, clients must match up the sync id's the their corresponding local id's (to that client), or more likely create new records (with new local id's) for the incoming entities.
 
-##### <a name="ep-notes-get-failure"></a>Failure
-
 On an **authentication failure**, (e.g. non-existent username, incorrect password, or no HTTP Basic Authentication sent), the server will respond with **HTTP 401 Unauthorized** with an optional body containing a plain text message. Clients should prompt the user to correct the password, etc.
 
 On a **server-side error**, the server will respond with the standard **HTTP 500 Internal Server Error** with an optional body containing a plain text message describing the error. Clients should alert the user to the issue. 
 
-##### <a name="ep-notes-get-sample-response"></a>Sample response
+##### <a name="ep-notes-get-sample-response"></a>Sample Response
 
 ```json
 {
@@ -207,3 +207,42 @@ On a **server-side error**, the server will respond with the standard **HTTP 500
     ]
 }
 ```
+
+#### <a name="ep-notes-post"></a>POST `notes`
+
+##### <a name="ep-notes-post-request"></a>Request Format
+
+To send notes to the server, clients should POST to this endpoint, authenticated as usual, with a JSON body with the same structure as the one returned by the server when retrieving notes. That is, a JSON object with a single `notes` field which houses JSON Array of `Note` entities in JSON form, and within each `Note` entity, a `note_contents` field housing a JSON Array of `Note Content` entities in JSON form. Details below. (also see the *[sample request](#ep-notes-post-sample-request)*).
+
+A `Note` can either be *new to the server* or *already on the server, but being updated*. 
+
+* if a `Note` is *new to the server*, specify `n_local_id` and either omit `n_sync_id` or send an `n_sync_id` of 0 (as it doesn't have a sync id yet -- this also is how the server determines if a given `Note` is new). Additionally, specify the other fields (i.e. `date_created` and `packaging_method`) as well.
+* if a `Note` is *already on the server, but being updated*, specify `n_local_id` and the `n_sync_id` previously received from the server. All other fields should be omitted.
+
+Within the JSON Array of `Note Content`s in the `note_contents` field, list the `Note Content`s not yet sent to the server. An easy way to determine if a `Note Content` has been sent to the server or not is to look for the presence of a non-zero `nc_sync_id`, as these are provided by the server after a successful sync (*see [below](#ep-notes-post-success) for details*). 
+
+Since every `Note Content` should be new to the server, for each `Note Content`, specify `nc_local_id`, either omit `nc_sync_id` or set it to 0, and include all other fields (i.e. `date_created`, `deleted`, and `packaged_data`)
+
+##### <a name="ep-notes-post-response"></a>Response Format
+
+On **success** and **partial success** (successful authentication, no fatal server-side errors, and at least some `Note`s accepted), the server will respond with **HTTP 200 OK** or **HTTP 202 Accepted**, respectively. The body will be a JSON object with the same structure as the request, but for each `Note` and `Note Content`, it will only include the local id's, and sync id's. Additionally, for `Note`s, a `status` field and an optional `reason` field will be given.
+
+The basic success/failure model for this endpoint is associated with `Note`s. Either an entire `Note` with all its enclosed `Note Content`s is accepted, or it's not. The server will never partially accept only some of the `Note Content`s sent for a `Note`. It's all or nothing. This simplifies logic on the client side and provides for some level of consistency. The server will, however, partially accept only some `Note`s and not others. That's when the server will respond with **HTTP 202 Accepted**.
+
+Similar to when [retrieving notes](#ep-notes-get-response), on an **authentication failure**, the server will respond with **HTTP 401 Unauthorized**, and on a complete and utter **server-side error**, the server will respond with the standard **HTTP 500 Internal Server Error**.
+
+The following will be included with each entity in the response:
+
+* **local id's**: each `Note` and `Note Content` in the response will contain their `n_local_id` and `nc_local_id`, respectively, exactly as sent in the request. This helps clients identify which entity the server is referring to.
+* **sync id's**:
+    * for `Note`s *already on the server*, `n_sync_id` will be given back as is
+    * for `Note`s *new to the server*, a new non-zero `n_sync_id` will be given back *only if* that `Note` is accepted by the server, otherwise a `n_sync_id` of 0 will be given back
+    * for `Note Content`s (which are always new), a new non-zero `nc_sync_id` will be given back *only if* ALL `Note Content`s sent for the corresponding `Note` are accepted, otherwise, a `nc_sync_id` of 0 will be given back
+* **status** (present only on `Note`s): a one-word token describing whether that `Note` or changes to it were accepted by the server ("changes to it" meaning the `Note Content`s sent in the request for this `Note`). `status` can take on one of the following values:
+    * *success*: the `Note` or changes to it were accepted by the server -- an appropriate `n_sync_id` for the `Note` and appropriate `nc_sync_id`s for the enclosed `Note Content`s will be sent back as well
+    * *bad request*: the `Note` or changes to it were rejected due to something wrong with the entity fields given in the `Note` itself or the enclosed `Note Content`s (missing fields, malformed data, etc.)
+    * *forbidden*: (only occurs for `Note`s *already on the server*): changes to the `Note` were rejected as the `Note` (based on its `n_sync_id`) does not belong to the authenticated user!
+    * *unknown*: an unknown server-side error occurred while processing the `Note` or its enclosed `Note Content`s
+* **reason** (optional; may not be present, even for failures): a semi-human-readable message describing the specifics of an error that occurred. 
+
+
