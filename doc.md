@@ -300,7 +300,7 @@ The following will be included with each entity in the response:
         }
     ]
 }
-`
+```
 
 ##### <a name="ep-notes-post-sample-response"></a>Sample Response
 
