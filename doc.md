@@ -255,13 +255,13 @@ The following will be included with each entity in the response:
     "notes": [
         {
             "n_local_id": 5,
-            "n_sync_id": 0, # this is new to the server
+            "n_sync_id": 0, #"this is new to the server"#
             "date_created": 1435973782,
             "packaging_method": "none",
             "note_contents": [
                 {
                     "nc_local_id": 120,
-                    # omitting sync id's is the same as specifying 0
+                    #"omitting sync id's is the same as specifying 0"#
                     "date_created": 1435974569,
                     "deleted": 0,
                     "packaged_data": "{ ... some beginner content ... }"
@@ -270,7 +270,7 @@ The following will be included with each entity in the response:
         },
         {
             "n_local_id": 3,
-            "n_sync_id": 9, # this is already on the server (all other fields omitted)
+            "n_sync_id": 9, #"this is already on the server (all other fields omitted)"#
             "note_contents": [
                 {
                     "nc_local_id": 84,
@@ -310,39 +310,39 @@ HTTP 202 Accepted
     "notes": [
         {
             "n_local_id": 5,
-            "n_sync_id": 16, # new sync id given back by server
+            "n_sync_id": 16, #"new sync id given back by server"#
             "status": "success",
             "note_contents": [
                 {
                     "nc_local_id": 120,
-                    "nc_sync_id": 541, # new sync id given back by server
+                    "nc_sync_id": 541, #"new sync id given back by server"#
                 }
             ]
         },
         {
             "n_local_id": 3,
-            "n_sync_id": 9, # the same sync id that was sent
+            "n_sync_id": 9, #"the same sync id that was sent"#
             "status": "success",
             "note_contents": [
                 {
                     "nc_local_id": 84,
-                    "nc_sync_id": 545, # new sync id given back by server
+                    "nc_sync_id": 545, #"new sync id given back by server"#
                 },
                 {
                     "nc_local_id": 118,
-                    "nc_sync_id": 546, # new sync id given back by server
+                    "nc_sync_id": 546, #"new sync id given back by server"#
                 }
             ]
         },
         {
             "n_local_id": 2,
-            "n_sync_id": 14, # the same sync id that was sent
+            "n_sync_id": 14, #"the same sync id that was sent"#
             "status": "forbidden",
             "reason": "Note with sync id 14 does not belong to current user!",
             "note_contents": [
                 {
                     "nc_local_id": 51,
-                    "nc_sync_id": 0 # a new sync id was not assigned, because forbidden
+                    "nc_sync_id": 0 #"a new sync id was not assigned, because forbidden"#
                 }
             ]
         }
