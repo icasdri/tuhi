@@ -1,6 +1,6 @@
 # Tuhi Documentation
 
-[Tuhi](https://github.com/icasdri/tuhi) is a self-hosted synchronized notes solution based on a flexible JSON-based storage format and an extensible asynchronous HTTP-based client-server architecture. This document specifies storage format as well as the synchronization protocol between clients and servers as a reference for developers. Users seeking the list of clients (and their associated setup instructions, etc.) should visit the [project home](https://github.com/icasdri/tuhi) instead.
+[Tuhi](https://github.com/icasdri/tuhi) is a self-hosted synchronized notes solution based on a flexible JSON-based storage format and an extensible asynchronous HTTP-based client-server architecture. This document specifies the [storage format](#format) as well as the [synchronization protocol](#syncing) between clients and servers as a reference for developers. Users seeking the list of clients (and their associated setup instructions, etc.) should visit the [project home](https://github.com/icasdri/tuhi) instead.
 
 * [Format](#format)
   * [Entities](#entities)
