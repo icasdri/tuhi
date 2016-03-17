@@ -1,6 +1,6 @@
 # Tuhi Documentation
 
-[Tuhi](https://github.com/icasdri/tuhi) is a self-hosted synchronized notes solution based on a flexible JSON-based storage format and an extensible asynchronous HTTP-based client-server architecture. This document specifies storage format as well as the synchronization protocl between clients and servers as a reference for developers. Users seeking the list of clients (and their associated setup instructions, etc.) should visit the [project home](https://github.com/icasdri/tuhi) instead.
+[Tuhi](https://github.com/icasdri/tuhi) is a self-hosted synchronized notes solution based on a flexible JSON-based storage format and an extensible asynchronous HTTP-based client-server architecture. This document specifies storage format as well as the synchronization protocol between clients and servers as a reference for developers. Users seeking the list of clients (and their associated setup instructions, etc.) should visit the [project home](https://github.com/icasdri/tuhi) instead.
 
 * [Format](#format)
   * [Entities](#entities)
@@ -50,7 +50,7 @@ To (soft) delete a note (i.e. put it in the Trash), make a new `Note Content` wi
 
 To restore a note from the Trash, in a similar fashion, make a new `Note Content` with `packaged_data` copied from the deleted version (remember, it was copied from the non-deleted version), but with `deleted` set to 0.
 
-To permanently delete a note, make a new `Note Content`, with `deleted` set to 2 (the *permanent deletion request*). Addidionally, delete (as in drop from the database, `rm` from the filesystem, etc.) all other `Note Content`s (this is the *permanent* part). Then, after syncing the *permanent deletion request* with the server (*see [Syncing](#syncing) for details*), that may be deleted as well -- the server will take care of propogating to other clients from there. If a client has a *permanent deletion request* synced in, it may be desirable (and is mandated for encrypted notes) to confirm with the user that he/she has indeed permanently deleted it in order to prevent a sort of Denial of Service attack resulting in data loss.
+To permanently delete a note, make a new `Note Content`, with `deleted` set to 2 (the *permanent deletion request*). Additionally, delete (as in drop from the database, `rm` from the filesystem, etc.) all other `Note Content`s (this is the *permanent* part). Then, after syncing the *permanent deletion request* with the server (*see [Syncing](#syncing) for details*), that may be deleted as well -- the server will take care of propagating to other clients from there. If a client has a *permanent deletion request* synced in, it may be desirable (and is mandated for encrypted notes) to confirm with the user that he/she has indeed permanently deleted it in order to prevent a sort of Denial of Service attack resulting in data loss.
 
 See that `Note`s and `Note Content`s are **immutable**. That is, once they're created, their contents (i.e. their field values) never change. Ever. Immutability guarantees that once entities are synced, they're synced for good and neither client nor server needs to worry about them again.
 
@@ -70,7 +70,7 @@ In the future, we will define more packaging methods (performing actions such as
 
 ### Unpackaged Data
 
-The *unpackaged data* of a `Note Content` refers to thhe `packaged_data` after being run through the appropriate *packaging method*. It is **stringified JSON** that houses the actual data (user-visible content) of the note (or more precisely the `Note Content` -- the note at a specific point in time). This data includes the *type* of the note (i.e. is it a plain ol' note, a todo list, a kanban board, etc.) and, of course, the actual type-specific content that represent what the user sees. 
+The *unpackaged data* of a `Note Content` refers to the `packaged_data` after being run through the appropriate *packaging method*. It is **stringified JSON** that houses the actual data (user-visible content) of the note (or more precisely the `Note Content` -- the note at a specific point in time). This data includes the *type* of the note (i.e. is it a plain ol' note, a todo list, a kanban board, etc.) and, of course, the actual type-specific content that represent what the user sees. 
 
 To interact with *unpackaged data*, clients must first run `packaged_data` through the corresponding *packaging method*, then parse the resulting string to obtain the JSON structure. 
 
