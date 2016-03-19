@@ -39,6 +39,7 @@ Listed below are the details of the two entities, `Note` and `Note Content`, use
 * **n_sync_id** (integer): server-unique identifier for this `Note` on the server (this is obtained from server -- *see [Syncing](#syncing) for details*)
 * **date_created** (integer): the date this `Note` was created on the client (expressed as seconds since the Unix epoch)
 * **packaging_method** (string): the name of the packaging method (*see [Packaging](#packaging) for details*)
+* **type** (string): the type of the note (a plain ol' note, a todo list, a kanban board, etc.) (*see [Types](#types) for details*)
 
 #### `Note Content`
 
@@ -80,15 +81,14 @@ In the future, we will define more packaging methods (performing actions such as
 
 ### Unpackaged Data
 
-The *unpackaged data* of a `Note Content` refers to the `packaged_data` after being run through the appropriate *packaging method*. It is **stringified JSON** that houses the actual data (user-visible content) of the note (or more precisely the `Note Content` -- the note at a specific point in time). This data includes the *type* of the note (i.e. is it a plain ol' note, a todo list, a kanban board, etc.) and, of course, the actual type-specific content that represent what the user sees. 
+The *unpackaged data* of a `Note Content` refers to the `packaged_data` after being run through the appropriate *packaging method*. It is **stringified JSON** that houses the actual data (user-visible content) of the note (or more precisely the `Note Content` -- the note at a specific point in time). This data must be interpreted in light of the `Note`'s `type` -- it is type-specific content that represent what the user sees. 
 
 To interact with *unpackaged data*, clients must first run `packaged_data` through the corresponding *packaging method*, then parse the resulting string to obtain the JSON structure. 
 
-The only fields of the resulting JSON object that is guaranteed is `type` (denoting the type of the note) and `title` (the title of the note) -- everything else is type-specific data (see [Types](#types) below).
+The only fields of the resulting JSON object that is `title` (the title of the note) -- everything else is type-specific data as determined by the `type` field of `Note` (see [Types](#types) below).
 
 ```json
     {
-        "type": "string denoting the type of note",
         "title": "string of the note's title",
         "type_specific_field1": "some type-specific data",
         "type_specific_field2": "some type-specific data"
@@ -103,7 +103,6 @@ This type denotes a plain ol' note. It's JSON structure is as follows:
 
 ```json
     {
-        "type": "plain",
         "title": "the note's title",
         "text": "<string>",
         "word_wrap": "<string> off|normal|break",
@@ -147,7 +146,7 @@ When retrieving notes, clients should specify an optional `after` URL parameter.
 
 ##### <a name="ep-notes-get-response"></a>Response Format
 
-On **success** (successful authentication and no server-side errors), the server will respond with **HTTP 200 OK** with a body containing a JSON object (see sample response below). This JSON object will contain one `notes` field, which houses a JSON Array of `Note` entities in JSON form. Each of these `Note` entities then contain their respective `n_sync_id` (the server-side identifier), `date_created`, and `packaging_method` fields (*see [Entities](#entities) for details*).
+On **success** (successful authentication and no server-side errors), the server will respond with **HTTP 200 OK** with a body containing a JSON object (see sample response below). This JSON object will contain one `notes` field, which houses a JSON Array of `Note` entities in JSON form. Each of these `Note` entities then contain their respective `n_sync_id` (the server-side identifier), `date_created`, `packaging_method`, and `type` fields (*see [Entities](#entities) for details*).
 
 Within each `Note` entity is also a `note_contents` field which houses a JSON Array of the associated `Note Content` entities of this `Note` in JSON form. Each of these `Note Content` entities will then contain their respective `nc_sync_id` (the server-side identifier), `date_created`, and `deleted`, and `packaged_data` fields (*see [Entities](#entities) for details*).
 
@@ -167,6 +166,7 @@ HTTP 200 OK
             "n_sync_id": 23,
             "date_created": 1435973782,
             "packaging_method": "none",
+            "type": "plain",
             "note_contents": [
                 {
                     "nc_sync_id": 321,
@@ -186,6 +186,7 @@ HTTP 200 OK
             "n_sync_id": 12,
             "date_created": 1435970001,
             "packaging_method": "none",
+            "type": "plain",
             "note_contents": [
                 {
                     "nc_sync_id": 256,
@@ -219,7 +220,7 @@ To send notes to the server, clients should POST to this endpoint, authenticated
 
 A `Note` can either be *new to the server* or *already on the server, but being updated*. 
 
-* if a `Note` is *new to the server*, specify `n_local_id` and either omit `n_sync_id` or send an `n_sync_id` of 0 (as it doesn't have a sync id yet -- this also is how the server determines if a given `Note` is new). Additionally, specify the other fields (i.e. `date_created` and `packaging_method`) as well.
+* if a `Note` is *new to the server*, specify `n_local_id` and either omit `n_sync_id` or send an `n_sync_id` of 0 (as it doesn't have a sync id yet -- this also is how the server determines if a given `Note` is new). Additionally, specify the other fields (i.e. `date_created`, `packaging_method`, and `type`) as well.
 * if a `Note` is *already on the server, but being updated*, specify `n_local_id` and the `n_sync_id` previously received from the server. All other fields should be omitted.
 
 Within the JSON Array of `Note Content`s in the `note_contents` field, list the `Note Content`s not yet sent to the server. An easy way to determine if a `Note Content` has been sent to the server or not is to look for the presence of a non-zero `nc_sync_id`, as these are provided by the server after a successful sync (*see [below](#ep-notes-post-success) for details*). 
@@ -258,6 +259,7 @@ The following will be included with each entity in the response:
             "n_sync_id": 0, #"this is new to the server"#
             "date_created": 1435973782,
             "packaging_method": "none",
+            "type": "plain",
             "note_contents": [
                 {
                     "nc_local_id": 120,
